@@ -1,13 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-# G = nx.Graph()
-# G.add_node(1)
-# G.add_node(2)
-# G.add_node(3)
-# G.add_edge(1, 2)
-# G.add_edge(2, 3)
-
 G = nx.Graph([(1, 2), (1, 3), (1, 5), (3, 4), (4, 5)])
 
 num_nodes = G.number_of_nodes()
@@ -54,18 +47,10 @@ nx.draw_networkx(
 
 # Title/legend
 font = {"color": "k", "fontweight": "bold", "fontsize": 20}
-ax.set_title("Gene functional association network (C. elegans)", font)
+ax.set_title("Network Diagram with Weighted Centrality", font)
 # Change font color for legend
 font["color"] = "r"
 
-ax.text(
-    0.80,
-    0.10,
-    "node color = community structure",
-    horizontalalignment="center",
-    transform=ax.transAxes,
-    fontdict=font,
-)
 ax.text(
     0.80,
     0.06,
@@ -74,7 +59,6 @@ ax.text(
     transform=ax.transAxes,
     fontdict=font,
 )
-
 
 # Resize figure for label readibility
 ax.margins(0.1, 0.05)
