@@ -3,3 +3,6 @@ matplotlib
 requests
 pandas
 numpy
+scipy
+openpyxl
+d3graph
