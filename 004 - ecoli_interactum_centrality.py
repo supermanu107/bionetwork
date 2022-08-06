@@ -8,7 +8,7 @@ try:
     print(df_all.columns)
 
     # filter  > 700 combined_score
-    df_filtered = df_all[df_all['combined_score'] > 700]
+    df_filtered = df_all[df_all['combined_score'] >= 700]
     print("Total rows after filter:  {}".format(df_filtered.shape[0]))
 
     df_data = df_filtered[['protein1', 'protein2', 'combined_score']]
