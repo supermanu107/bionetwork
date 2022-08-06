@@ -14,6 +14,7 @@ try:
     df_data = df_filtered[['protein1', 'protein2', 'combined_score']]
     print(df_data.columns)
 
+    # read alias file
     # df_alias_all = pd.read_csv('data/511145.protein.aliases.v11.5.txt', sep='\t', usecols=[0])
     # print("Row count of alis raw data:  {}".format(df_alias_all.shape[0]))
 
