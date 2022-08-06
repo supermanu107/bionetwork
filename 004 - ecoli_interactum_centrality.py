@@ -14,9 +14,8 @@ try:
     df_data = df_filtered[['protein1', 'protein2', 'combined_score']]
     print(df_data.columns)
 
-    # To get essential nodes from DEG Database
-    # df_DEG_all = pd.read_csv('data/511145.protein.aliases.v11.5.txt', sep='\t', usecols=[0])
-    # print("Row count of DEG raw data:  {}".format(df_DEG_all.shape[0]))
+    # df_alias_all = pd.read_csv('data/511145.protein.aliases.v11.5.txt', sep='\t', usecols=[0])
+    # print("Row count of alis raw data:  {}".format(df_alias_all.shape[0]))
 
     G = nx.from_pandas_edgelist(df_data, "protein1", "protein2", ["combined_score"])
 
