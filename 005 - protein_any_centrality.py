@@ -116,10 +116,11 @@ try:
     df_table2 = pd.DataFrame(table2_dict)
     print(df_table2)
 
+    # Centrality measures for EE data
     G = nx.from_pandas_edgelist(df_ee_data, "protein1", "protein2", ["combined_score"])
 
     # "https://stackoverflow.com/questions/50243215/networkx-how-to-write-to-csv-multiple-centrality-metrics"
-    df = pd.DataFrame(dict(
+    df_centrality_measures = pd.DataFrame(dict(
         DEGREE_CENTRALITY=nx.degree_centrality(G),
         EIGENVECTOR=nx.eigenvector_centrality(G),
         CLOSENESS_CENTRALITY=nx.closeness_centrality(G),
@@ -128,8 +129,8 @@ try:
     
     #
     output_file_name = str(taxonomyID) + '-centrality.csv'
-    print("\Saving all centrality values in {}".format(output_file_name))
-    df.to_csv(output_file_name, index_label='Essential Node')
+    print("\nSaving all centrality values in {}".format(output_file_name))
+    df_centrality_measures.to_csv(output_file_name, index_label='Essential Node')
 
     print('\nDone')
 
