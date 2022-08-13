@@ -1,6 +1,5 @@
 import urllib
 import networkx as nx
-import pandas
 import pandas as pd
 import gzip
 import requests
@@ -34,48 +33,36 @@ def download_netgenes_url(url, organism_name):
 
 
 try:
-    print("++++++++++++++++++++++++++++++++++++++")
-    print("Essential Node - Centrality Calculator")
-    print("++++++++++++++++++++++++++++++++++++++\n")
-    taxonomyID = int(input("Please enter NCBI Taxonomy ID: ") or "511145")
+    taxonomyID = int(input("Please enter NCBI Taxonomy ID: "))
 
+    # Download all protein connection links from STRING database
     protein_link_file_name = str(taxonomyID) + ".protein.links.v11.5.txt.gz";
     protein_url = "https://stringdb-static.org/download/protein.links.v11.5/" + protein_link_file_name
     download_protein_url(protein_url, protein_link_file_name)
 
+    # Select organism name matching taxonomy id
     df_netgenes_species = pd.read_csv("data/netgenes_species_list.csv", sep=',')
-    # print("Total Rows:  {}".format(df_netgenes_species.shape[0]))
-
     df_netgenes_selected = df_netgenes_species.loc[df_netgenes_species['NCBI Taxonomy ID'] == taxonomyID]
-    # print(df_netgenes_selected)
-
     selected_organism_name = df_netgenes_selected['Organism Name'].values[0]
-    # print("Selected Organism: {}".format(selected_organism_name))
 
     df_all = pd.read_csv('data/' + str(taxonomyID) + '.protein.links.v11.5.txt', sep=' ')
-    # print("Total Rows:  {}".format(df_all.shape[0]))
-    # print(df_all.head(10))
-    # print(df_all.columns)
-    #
     # filter  > 700 combined_score
     df_filtered = df_all[df_all['combined_score'] >= 700]
-    # print("Total rows after filter:  {}".format(df_filtered.shape[0]))
-    #
     df_data = df_filtered[['protein1', 'protein2', 'combined_score']]
-    # print(df_data.columns)
     G1 = nx.from_pandas_edgelist(df_data, "protein1", "protein2", ["combined_score"])
     num_of_nodes = G1.number_of_nodes()
     num_of_edges = G1.number_of_edges()
+
     # read essential gens from NetGenes Data
     netgenes_url = "https://rbc-dsai-iitm.github.io/NetGenes/CSV/" + urllib.parse.quote(selected_organism_name) + ".csv"
     download_netgenes_url(netgenes_url, selected_organism_name)
-
     df_essential_genes_all = pd.read_csv('data/' + selected_organism_name + '.csv', header=0,
                                          names=['node', 'alias', 'notes', 'score'], sep=',')
     num_of_essential_nodes = df_essential_genes_all.shape[0]
-    # print("Row count of essential genes:  {}".format(df_essential_genes_all.shape[0]))
-    pandas.set_option('display.max_columns', None)
-    pandas.set_option('display.width', 200)
+
+
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', 200)
 
     essential_nodes_ratio = "{:.1f} %".format((num_of_essential_nodes/num_of_nodes)*100)
     table1_dict = {
@@ -93,33 +80,19 @@ try:
 
     df_essential_gene_data_list = df_essential_genes_all['node'].values.tolist()
 
-    # Essential to Essential (EE)
-
-    # df_node_1_esl = df_data.loc[df_data['protein1'].isin(df_essential_gene_data_list)]
-    # df_node_1_nesl = df_data.loc[-df_data['protein1'].isin(df_essential_gene_data_list)]
-    # df_node_2_esl = df_data.loc[df_data['protein2'].isin(df_essential_gene_data_list)]
-    # df_node_2_nesl = df_data.loc[-df_data['protein2'].isin(df_essential_gene_data_list)]
-    # print("\n1:{} + {} = {} ; 2:{} + {} = {}".format(
-    #     df_node_1_esl.shape[0], df_node_1_nesl.shape[0], df_data.shape[0],
-    #     df_node_2_esl.shape[0], df_node_2_nesl.shape[0], df_data.shape[0],
-    # ))
-
     df_ee_data = df_data.loc[df_data['protein1'].isin(df_essential_gene_data_list) & df_data['protein2'].isin(df_essential_gene_data_list)]
-    # num_ee = df_ee_data.shape[0]
     Gee = nx.from_pandas_edgelist(df_ee_data, "protein1", "protein2", ["combined_score"])
     num_ee = Gee.number_of_edges()
     num_ee_ratio = "{:.3f}".format((num_ee/num_of_edges))
 
     # Non-Essential to Essential (NE)
     df_ne_data = df_data.loc[-df_data['protein1'].isin(df_essential_gene_data_list) & df_data['protein2'].isin(df_essential_gene_data_list)]
-    # num_ne = df_ne_data.shape[0]
     Gne = nx.from_pandas_edgelist(df_ne_data, "protein1", "protein2", ["combined_score"])
     num_ne = Gne.number_of_edges()
     num_ne_ratio = "{:.3f}".format((num_ne/num_of_edges))
 
     # Non-Essential to Non-Essential (NN)
     df_nn_data = df_data.loc[~df_data['protein1'].isin(df_essential_gene_data_list) & ~df_data['protein2'].isin(df_essential_gene_data_list)]
-    # num_nn = df_nn_data.shape[0]
     Gnn = nx.from_pandas_edgelist(df_nn_data, "protein1", "protein2", ["combined_score"])
     num_nn = Gnn.number_of_edges()
     num_nn_ratio = "{:.3f}".format((num_nn/num_of_edges))
@@ -156,11 +129,10 @@ try:
         DEGREE_CENTRALITY=nx.degree_centrality(G),
         EIGENVECTOR=nx.eigenvector_centrality(G),
         CLOSENESS_CENTRALITY=nx.closeness_centrality(G),
-        BETWEENNESS_CENTRALITY=nx.betweenness_centrality(G),
-        CLUSTCOEF=nx.clustering(G),
+        BETWEENNESS_CENTRALITY=nx.betweenness_centrality(G)
     ))
     #
-    output_file_name = 'data/' + str(taxonomyID) + '-centrality.csv'
+    output_file_name = str(taxonomyID) + '-centrality.csv'
     print("\nExporting all centrality values to {}".format(output_file_name))
     df.to_csv(output_file_name, index_label='Essential Node')
 
