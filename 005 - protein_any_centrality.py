@@ -28,11 +28,8 @@ def download_protein_url(url, protein_link_gz_file_name):
 # Download essential genes from netgenes website
 def download_netgenes_url(url, organism_name):
     print("Downloading essential genes from Netgenes database: ", url)
-    # open in binary mode
     with open("data/" + organism_name + '.csv', "wb") as file:
-        # get request
         response = requests.get(url)
-        # write to file
         file.write(response.content)
 
 
@@ -127,6 +124,8 @@ try:
     num_nn = Gnn.number_of_edges()
     num_nn_ratio = "{:.3f}".format((num_nn/num_of_edges))
 
+    assortativity_coefficient = nx.degree_assortativity_coefficient(G1)
+
     print("\nTable 2 - Assortativity coefficients for the networks considered in this study")
     print("--------------------------------------------------------------------------------")
     table2_dict = {
@@ -135,7 +134,8 @@ try:
         "EE" : [num_ee_ratio],
         "NE": [num_ne_ratio],
         "NN": [num_nn_ratio],
-        "Total edges": [num_of_edges]
+        "Total edges": [num_of_edges],
+        "Assortavity (r)": assortativity_coefficient
             }
     df_table2 = pd.DataFrame(table2_dict)
     print(df_table2)
@@ -164,7 +164,7 @@ try:
     print("\nExporting all centrality values to {}".format(output_file_name))
     df.to_csv(output_file_name, index_label='Essential Node')
 
-    print('\nCompleted all centrality calculations')
+    print('\nDone')
 
 except Exception as e:
     print(e)
