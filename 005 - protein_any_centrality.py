@@ -14,7 +14,8 @@ def download_protein_url(url, protein_link_gz_file_name):
     print("\nDownloading proteins from STRING database", url)
     request.urlretrieve(url=url, filename=protein_link_gz_file_name)
     protein_link_file_name = re.split(pattern=r'\.gz', string=protein_link_gz_file_name)[0]
-    # Unzip ".gz" file
+
+    # Unzip ".gz" file and save in data folder
     with gzip.open(protein_link_gz_file_name, 'rb') as f_in:
         with open("data/" + protein_link_file_name, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
@@ -80,6 +81,8 @@ try:
 
     df_essential_gene_data_list = df_essential_genes_all['node'].values.tolist()
 
+    # match protein names against essential genes and find match
+    # Essential to Essential (EE)
     df_ee_data = df_data.loc[df_data['protein1'].isin(df_essential_gene_data_list) & df_data['protein2'].isin(df_essential_gene_data_list)]
     Gee = nx.from_pandas_edgelist(df_ee_data, "protein1", "protein2", ["combined_score"])
     num_ee = Gee.number_of_edges()
@@ -113,16 +116,7 @@ try:
     df_table2 = pd.DataFrame(table2_dict)
     print(df_table2)
 
-    # # Essential to Non-Essential
-    # df_centrality_data = df_data.loc[df_data['protein1'].isin(df_essential_gene_data_list) & -df_data['protein2'].isin(df_essential_gene_data_list)]
-    #
-    # # Non-Essential to Non-Essential
-    # df_centrality_data = df_data.loc[-df_data['protein1'].isin(df_essential_gene_data_list) & -df_data['protein2'].isin(df_essential_gene_data_list)]
-
-    # print("Total rows after matching essential genes:  {}".format(df_centrality_data.shape[0]))
-
     G = nx.from_pandas_edgelist(df_ee_data, "protein1", "protein2", ["combined_score"])
-    # print('Nodes {}  Edges {}'.format(G.number_of_nodes(), G.number_of_edges()))
 
     # "https://stackoverflow.com/questions/50243215/networkx-how-to-write-to-csv-multiple-centrality-metrics"
     df = pd.DataFrame(dict(
@@ -131,9 +125,10 @@ try:
         CLOSENESS_CENTRALITY=nx.closeness_centrality(G),
         BETWEENNESS_CENTRALITY=nx.betweenness_centrality(G)
     ))
+    
     #
     output_file_name = str(taxonomyID) + '-centrality.csv'
-    print("\nExporting all centrality values to {}".format(output_file_name))
+    print("\Saving all centrality values in {}".format(output_file_name))
     df.to_csv(output_file_name, index_label='Essential Node')
 
     print('\nDone')
