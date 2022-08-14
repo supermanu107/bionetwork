@@ -34,7 +34,7 @@ def download_netgenes_url(url, organism_name):
 
 
 try:
-    taxonomyID = int(input("Please enter NCBI Taxonomy ID: "))
+    taxonomyID = int(input("Enter NCBI Taxonomy ID: "))
 
     # Download all protein connection links from STRING database
     protein_link_file_name = str(taxonomyID) + ".protein.links.v11.5.txt.gz";
@@ -54,7 +54,7 @@ try:
     num_of_nodes = G1.number_of_nodes()
     num_of_edges = G1.number_of_edges()
 
-    # read essential gens from NetGenes Data
+    # read essential genes from NetGenes Data
     netgenes_url = "https://rbc-dsai-iitm.github.io/NetGenes/CSV/" + urllib.parse.quote(selected_organism_name) + ".csv"
     download_netgenes_url(netgenes_url, selected_organism_name)
     df_essential_genes_all = pd.read_csv('data/' + selected_organism_name + '.csv', header=0,
@@ -74,7 +74,7 @@ try:
         "Edges (interactions)": [num_of_edges]
             }
 
-    print("\nTable 1 - Summary of the networks considered in this study")
+    print("\nTable 1 - Summary of the networks")
     print("----------------------------------------------------------")
     df_table1 = pd.DataFrame(table1_dict)
     print(df_table1)
@@ -102,7 +102,7 @@ try:
 
     assortativity_coefficient = nx.degree_assortativity_coefficient(G1)
 
-    print("\nTable 2 - Assortativity coefficients for the networks considered in this study")
+    print("\nTable 2 - Assortativity coefficients for the networks")
     print("--------------------------------------------------------------------------------")
     table2_dict = {
         "Organism": [selected_organism_name],
